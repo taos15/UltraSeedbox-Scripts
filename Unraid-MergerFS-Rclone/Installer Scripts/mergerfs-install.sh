@@ -38,34 +38,34 @@ done
 clear
 if [ "${version}" = "${default_version}" ]; then
     echo "mergerfs is installing/upgrading..."
-    mkdir -p "$HOME"/.mergerfs-tmp/
-    wget "https://github.com/trapexit/mergerfs/releases/download/${version}/mergerfs_${version}.debian-${debversion}_amd64.deb" -O "$HOME"/.mergerfs-tmp/mergerfs.deb
-    rm -rf "$HOME"/bin/*mergerfs*
-    dpkg -x "$HOME"/.mergerfs-tmp/mergerfs.deb "$HOME"/.mergerfs-tmp
-    cp "$HOME"/.mergerfs-tmp/usr/bin/* "$HOME"/bin
+    mkdir -p /root/.mergerfs-tmp/
+    wget "https://github.com/trapexit/mergerfs/releases/download/${version}/mergerfs_${version}.debian-${debversion}_amd64.deb" -O /root/.mergerfs-tmp/mergerfs.deb
+    rm -rf /root/bin/*mergerfs*
+    dpkg -x /root/.mergerfs-tmp/mergerfs.deb /root/.mergerfs-tmp
+    cp /root/.mergerfs-tmp/usr/bin/* /root/bin
 else
     echo "mergerfs is installing/upgrading..."
-    mkdir -p "$HOME"/.mergerfs-tmp/
-    wget "https://github.com/trapexit/mergerfs/releases/download/${version}/mergerfs_${version}.debian-${debversion}_amd64.deb" -O "$HOME"/.mergerfs-tmp/mergerfs.deb || {
+    mkdir -p /root/.mergerfs-tmp/
+    wget "https://github.com/trapexit/mergerfs/releases/download/${version}/mergerfs_${version}.debian-${debversion}_amd64.deb" -O /root/.mergerfs-tmp/mergerfs.deb || {
         echo "Asset for mergerfs version ${version} not found. Try installing ${default_version} by running the script again."
-        rm -rf "$HOME"/.mergerfs-tmp
+        rm -rf /root/.mergerfs-tmp
         exit 1
     }
-    rm -rf "$HOME"/bin/*mergerfs*
-    dpkg -x "$HOME"/.mergerfs-tmp/mergerfs.deb "$HOME"/.mergerfs-tmp
-    cp "$HOME"/.mergerfs-tmp/usr/bin/* "$HOME"/bin
+    rm -rf /root/bin/*mergerfs*
+    dpkg -x /root/.mergerfs-tmp/mergerfs.deb /root/.mergerfs-tmp
+    cp /root/.mergerfs-tmp/usr/bin/* /root/bin
 fi
 
 clear
 
-if [[ $("$HOME"/bin/mergerfs -V) ]]; then
+if [[ $(/root/bin/mergerfs -V) ]]; then
     echo "MergerFS installed correctly! Restart your SSH session to properly apply changes!"
-    rm -rf "$HOME"/.mergerfs-tmp
+    rm -rf /root/.mergerfs-tmp
     exit 0
 else
     echo "$version"
     echo "mergerfs install somehow failed. Please run this again!"
-    rm -rf "$HOME"/.mergerfs-tmp
+    rm -rf /root/.mergerfs-tmp
     exit 1
 fi
 exit

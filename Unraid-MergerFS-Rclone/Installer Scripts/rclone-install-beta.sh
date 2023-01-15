@@ -9,20 +9,20 @@ then
 else
     clear
     echo "Installing/Upgrading rclone beta..."
-    mkdir -p "$HOME"/.rclone-tmp
-    wget https://beta.rclone.org/rclone-beta-latest-linux-amd64.zip -O "$HOME"/.rclone-tmp/rclone.zip
-    unzip "$HOME"/.rclone-tmp/rclone.zip -d "$HOME"/.rclone-tmp/
-    cp "$HOME"/.rclone-tmp/rclone-v*/rclone "$HOME"/bin
+    mkdir -p /root/.rclone-tmp
+    wget https://beta.rclone.org/rclone-beta-latest-linux-amd64.zip -O /root/.rclone-tmp/rclone.zip
+    unzip /root/.rclone-tmp/rclone.zip -d /root/.rclone-tmp/
+    cp /root/.rclone-tmp/rclone-v*/rclone /root/bin
 fi
 
 clear
 
-if [[ $("$HOME"/bin/rclone version) ]]; then
+if [[ $(/root/bin/rclone version) ]]; then
     echo "rclone is installed correctly!"
-    rm -rf "$HOME"/.rclone-tmp
+    rm -rf /root/.rclone-tmp
     exit 0
 else
     echo "rclone install somehow failed. Please run this again!"
-    rm -rf "$HOME"/.rclone-tmp
+    rm -rf /root/.rclone-tmp
     exit 1
 fi

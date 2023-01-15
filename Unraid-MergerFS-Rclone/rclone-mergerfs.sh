@@ -12,13 +12,13 @@ fi
 echo
 
 declare -a paths
-paths[1]="${HOME}/Stuff/Mount"
-paths[2]="${HOME}/Stuff/Local/Downloads/torrents"
-paths[3]="${HOME}/Stuff/Local/Downloads/usenet"
-paths[4]="${HOME}/MergerFS"
-paths[5]="${HOME}/scripts"
-paths[6]="${HOME}/Stuff/Local/Movies"
-paths[7]="${HOME}/Stuff/Local/TV Shows"
+paths[1]="/root/Stuff/Mount"
+paths[2]="/root/Stuff/Local/Downloads/torrents"
+paths[3]="/root/Stuff/Local/Downloads/usenet"
+paths[4]="/root/MergerFS"
+paths[5]="/root/scripts"
+paths[6]="/root/Stuff/Local/Movies"
+paths[7]="/root/Stuff/Local/TV Shows"
 
 #Checks
 
@@ -29,7 +29,7 @@ if [ ! -f "/usr/sbin/rclone" ]; then
   exit 1
 fi
 
-if [ ! -f "${HOME}/bin/mergerfs" ]; then
+if [ ! -f "/root/bin/mergerfs" ]; then
   echo "mergerfs is not installed."
   echo "Install mergerfs, then run the script again. https://docs.usbx.me/link/344#bkmrk-preparation"
   exit 1
@@ -90,7 +90,7 @@ fi
 
 #Install systemd services
 
-cat <<EOF | tee "${HOME}/.config/systemd/user/rclone-vfs.service" >/dev/null
+cat <<EOF | tee "/root/.config/systemd/user/rclone-vfs.service" >/dev/null
 [Unit]
 Description=RClone VFS Service
 Wants=network-online.target
@@ -117,7 +117,7 @@ Restart=on-failure
 WantedBy=default.target
 EOF
 
-cat <<EOF | tee "${HOME}/.config/systemd/user/mergerfs.service" >/dev/null
+cat <<EOF | tee "/root/.config/systemd/user/mergerfs.service" >/dev/null
 [Unit]
 Description = MergerFS Service
 After=rclone-vfs.service
@@ -147,7 +147,7 @@ sleep 5
 #Install rclone-upload script
 
 if [ "${upload}" == "discord" ]; then
-  cat <<EOF | tee "${HOME}/scripts/rclone-upload.sh" >/dev/null
+  cat <<EOF | tee "/root/scripts/rclone-upload.sh" >/dev/null
 #!/bin/bash
 
 # Rclone upload script with optional Discord notification upon move completion (if something is moved)
@@ -156,15 +156,15 @@ if [ "${upload}" == "discord" ]; then
 # For example: */10 * * * * /path/to/rclone-upload.sh >/dev/null 2>&1
 # -----------------------------------------------------------------------------
 
-SOURCE_DIR="\$HOME/Stuff/Local/"
+SOURCE_DIR="\/root/Stuff/Local/"
 DESTINATION_DIR="${remote}:"
 
 DISCORD_WEBHOOK_URL="${webhook}"
 DISCORD_ICON_OVERRIDE="https://i.imgur.com/MZYwA1I.png"
 DISCORD_NAME_OVERRIDE="RCLONE"
 
-LOCK_FILE="\$HOME/scripts/rclone-upload.lock"
-LOG_FILE="\$HOME/scripts/rclone-upload.log"
+LOCK_FILE="\/root/scripts/rclone-upload.lock"
+LOG_FILE="\/root/scripts/rclone-upload.log"
 
 # DO NOT EDIT BELOW THIS LINE UNLESS YOU KNOW WHAT YOU'RE DOING
 # -----------------------------------------------------------------------------
@@ -183,8 +183,8 @@ else
 
   rclone_move() {
     rclone_command=\$(
-      "\$HOME"/bin/rclone move -vP \\
-      --config="\$HOME"/.config/rclone/rclone.conf \\
+      "\/root"/bin/rclone move -vP \\
+      --config="\/root"/.config/rclone/rclone.conf \\
       --exclude "Downloads/**" \\
       --drive-chunk-size 64M \\
       --use-mmap \\
@@ -277,10 +277,10 @@ else
 fi
 EOF
 else
-  cat <<EOF | tee "${HOME}/scripts/rclone-upload.sh" >/dev/null
+  cat <<EOF | tee "/root/scripts/rclone-upload.sh" >/dev/null
 #!/bin/bash
 
-lock_file="\$HOME/scripts/rclone-upload.lock"
+lock_file="\/root/scripts/rclone-upload.lock"
 
 trap 'rm -f "\$lock_file"; exit 0' SIGINT SIGTERM
 if [ -e "\$lock_file" ]
@@ -288,13 +288,13 @@ then
     echo "Rclone upload script is already running."
     exit
 else
-    if [ -f "\$HOME"/scripts/rclone-upload.log ]
+    if [ -f "\/root"/scripts/rclone-upload.log ]
     then
-        rm "\$HOME"/scripts/rclone-upload.log
+        rm "\/root"/scripts/rclone-upload.log
     fi
     touch "\$lock_file"
-    "\$HOME"/bin/rclone move -P "\$HOME"/Stuff/Local/ ${remote}: \\
-        --config="\$HOME"/.config/rclone/rclone.conf \\
+    "\/root"/bin/rclone move -P "\/root"/Stuff/Local/ ${remote}: \\
+        --config="\/root"/.config/rclone/rclone.conf \\
         --exclude "Downloads/**" \\
         --drive-chunk-size 64M \\
         --tpslimit 5 \\
@@ -305,7 +305,7 @@ else
         --use-mmap \\
         --transfers=2 \\
         --checkers=4 \\
-        --log-file "\$HOME"/scripts/rclone-upload.log
+        --log-file "\/root"/scripts/rclone-upload.log
     rm -f "\$lock_file"
     trap - SIGINT SIGTERM
     exit
@@ -313,11 +313,11 @@ fi
 EOF
 fi
 
-chmod +x "${HOME}/scripts/rclone-upload.sh"
+chmod +x "/root/scripts/rclone-upload.sh"
 
 #Install rclone-upload cronjob
 
-croncmd="${HOME}/scripts/rclone-upload.sh > /dev/null 2>&1"
+croncmd="/root/scripts/rclone-upload.sh > /dev/null 2>&1"
 cronjob="0 19 * * * $croncmd"
 (
   crontab -l 2>/dev/null | grep -v -F "$croncmd" || :
