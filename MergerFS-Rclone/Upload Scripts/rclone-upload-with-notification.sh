@@ -34,8 +34,8 @@ else
       /usr/sbin/rclone copy -vP \
       --config=/boot/config/plugins/rclone/.rclone.conf \
       --drive-chunk-size 1000M \
+      --exclude "Downloads/**" \
       --use-mmap \
-      --delete-empty-src-dirs \
       --log-file="$LOG_FILE" \
       --stats=9999m \
       --tpslimit=20 \
