@@ -28,7 +28,7 @@ then
 else
   touch "$LOCK_FILE"
 
-  rclone_move() {
+  rclone_copy() {
     rclone_command=$(
       /bin/rclone copy -vP \
       --config="$HOME"/.config/rclone/rclone.conf \
