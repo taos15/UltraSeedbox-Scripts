@@ -34,6 +34,7 @@ else
       /usr/sbin/rclone copy -vP \
       --config=/boot/config/plugins/rclone/.rclone.conf \
       --drive-chunk-size 1000M \
+      # --dry-run
       --exclude "Downloads/**" \
       --use-mmap \
       --log-file="$LOG_FILE" \
