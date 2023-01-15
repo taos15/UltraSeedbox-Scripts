@@ -16,7 +16,7 @@ DISCORD_ICON_OVERRIDE="https://i.imgur.com/MZYwA1I.png"
 DISCORD_NAME_OVERRIDE="RCLONE"
 
 LOCK_FILE="$HOME/rclone-upload.lock"
-LOG_FILE="$HOME/.rclone-upload.log"
+LOG_FILE="$HOME/rclone-upload.log"
 
 # DO NOT EDIT BELOW THIS LINE UNLESS YOU KNOW WHAT YOU'RE DOING
 # -----------------------------------------------------------------------------
@@ -33,7 +33,8 @@ else
     rclone_command=$(
       /usr/sbin/rclone copy -vP \
       --config=/boot/config/plugins/rclone/.rclone.conf \
-      --drive-chunk-size 1000M \
+      --drive-chunk-size 1024M \
+      # --dry-run
       --exclude "Downloads/**" \
       --use-mmap \
       --log-file="$LOG_FILE" \
