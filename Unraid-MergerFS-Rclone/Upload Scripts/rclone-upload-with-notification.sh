@@ -7,16 +7,15 @@
 # -----------------------------------------------------------------------------
 
 # use an encrypt remote named secure
-SOURCE_DIR="$HOME/Stuff/Local/"
+SOURCE_DIR="/mnt/user/tank/Media/"
 DESTINATION_DIR="secure:"
 
 # Add your discord webhook URL
 DISCORD_WEBHOOK_URL=""
-DISCORD_ICON_OVERRIDE="https://i.imgur.com/MZYwA1I.png"
 DISCORD_NAME_OVERRIDE="RCLONE"
 
-LOCK_FILE="$HOME/rclone-upload.lock"
-LOG_FILE="$HOME/rclone-upload.log"
+LOCK_FILE="/root/rclone-upload.lock"
+LOG_FILE="/root/rclone-upload.log"
 
 # DO NOT EDIT BELOW THIS LINE UNLESS YOU KNOW WHAT YOU'RE DOING
 # -----------------------------------------------------------------------------
@@ -32,17 +31,21 @@ else
   rclone_copy() {
     rclone_command=$(
       /usr/sbin/rclone copy -vP \
-      --config=/boot/config/plugins/rclone/.rclone.conf \
-      --drive-chunk-size 1024M \
-      # --dry-run
-      --exclude "Downloads/**" \
+      --drive-chunk-size 1024 \
+      --config=/boot/config/plugins/rclone/.rclone.conf
+      --exclude "torrents/**" \
+      --exclude "ultra-cc/**" \
+      --exclude "youtube/**" \
+      --exclude "NZB/**" \
+      --exclude "*DS_Store**" \
+      --exclude "Emby**" \
       --use-mmap \
       --log-file="$LOG_FILE" \
       --stats=9999m \
-      --tpslimit=20 \
-      --transfers=10 \
+      --tpslimit=5 \
+      --transfers=2 \
       --checkers=4 \
-      --bwlimit=20M \
+      --bwlimit=8M \
       --drive-stop-on-upload-limit \
       "$SOURCE_DIR" "$DESTINATION_DIR" 2>&1
     )
