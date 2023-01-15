@@ -3,3 +3,5 @@ https://docs.usbx.me/books/rclone/page/rclone-vfs-and-mergerfs-setup
 https://docs.usbx.me/books/rclone/page/installation-configuration-usage-of-rclone
 
 https://docs.usbx.me/books/rclone/page/rclone-optimizations-for-apps
+
+https://www.youtube.com/watch?v=-b9Ow2iX2DQ&ab_channel=SpaceinvaderOne
