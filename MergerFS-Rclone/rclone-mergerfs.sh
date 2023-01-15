@@ -22,7 +22,7 @@ paths[7]="${HOME}/Stuff/Local/TV Shows"
 
 #Checks
 
-if [ ! -f "${HOME}/bin/rclone" ]; then
+if [ ! -f "/usr/sbin/rclone" ]; then
   echo "rclone is not installed."
   echo "Install rclone stable, then run the script again. https://docs.usbx.me/link/6#bkmrk-rclone-stable"
   echo "Also, do not forget to configure your rclone remote."
@@ -180,7 +180,7 @@ else
        rm "\$LOG_FILE"
   fi
   touch "\$LOCK_FILE"
-  
+
   rclone_move() {
     rclone_command=\$(
       "\$HOME"/bin/rclone move -vP \\
@@ -198,22 +198,22 @@ else
       --drive-stop-on-upload-limit \\
       "\$SOURCE_DIR" "\$DESTINATION_DIR" 2>&1
     )
-    # "--stats=9999m" mitigates early stats output 
+    # "--stats=9999m" mitigates early stats output
     # "2>&1" ensures error output when running via command line
     echo "\$rclone_command"
   }
   rclone_move
 
   if [ "\$DISCORD_WEBHOOK_URL" != "" ]; then
-  
+
     rclone_sani_command="\$(echo \$rclone_command | sed 's/\x1b\[[0-9;]*[a-zA-Z]//g')" # Remove all escape sequences
 
-    # Notifications assume following rclone ouput: 
+    # Notifications assume following rclone ouput:
     # Transferred: 0 / 0 Bytes, -, 0 Bytes/s, ETA - Errors: 0 Checks: 0 / 0, - Transferred: 0 / 0, - Elapsed time: 0.0s
 
     transferred_amount=\${rclone_sani_command#*Transferred: }
     transferred_amount=\${transferred_amount%% /*}
-    
+
     send_notification() {
       output_transferred_main=\${rclone_sani_command#*Transferred: }
       output_transferred_main=\${output_transferred_main% Errors*}
@@ -224,7 +224,7 @@ else
       output_transferred=\${rclone_sani_command##*Transferred: }
       output_transferred=\${output_transferred% Elapsed*}
       output_elapsed=\${rclone_sani_command##*Elapsed time: }
-      
+
       notification_data='{
         "username": "'"\$DISCORD_NAME_OVERRIDE"'",
         "avatar_url": "'"\$DISCORD_ICON_OVERRIDE"'",
@@ -261,10 +261,10 @@ else
           }
         ]
       }'
-      
-      /usr/bin/curl -H "Content-Type: application/json" -d "\$notification_data" \$DISCORD_WEBHOOK_URL 
+
+      /usr/bin/curl -H "Content-Type: application/json" -d "\$notification_data" \$DISCORD_WEBHOOK_URL
     }
-    
+
     if [ "\$transferred_amount" != "0 B" ]; then
       send_notification
     fi

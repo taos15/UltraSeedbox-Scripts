@@ -1,20 +1,22 @@
 #!/bin/bash
 
-# Rclone upload script with optional Discord notification upon move completion (if something is moved)
+# Rclone upload script with optional Discord notification upon copy completion (if something is copyd)
 #
 # Recommended for use via cron
 # For example: */10 * * * * /path/to/rclone-upload.sh >/dev/null 2>&1
 # -----------------------------------------------------------------------------
 
+# use an encrypt remote named secure
 SOURCE_DIR="$HOME/Stuff/Local/"
-DESTINATION_DIR="remote:"
+DESTINATION_DIR="secure:"
 
+# Add your discord webhook URL
 DISCORD_WEBHOOK_URL=""
 DISCORD_ICON_OVERRIDE="https://i.imgur.com/MZYwA1I.png"
 DISCORD_NAME_OVERRIDE="RCLONE"
 
 LOCK_FILE="$HOME/rclone-upload.lock"
-LOG_FILE="$HOME/rclone-upload.log"
+LOG_FILE="$HOME/.rclone-upload.log"
 
 # DO NOT EDIT BELOW THIS LINE UNLESS YOU KNOW WHAT YOU'RE DOING
 # -----------------------------------------------------------------------------
@@ -26,39 +28,39 @@ then
   exit
 else
   touch "$LOCK_FILE"
-  
-  rclone_move() {
+
+  rclone_copy() {
     rclone_command=$(
-      "$HOME"/bin/rclone move -vP \
-      --config="$HOME"/.config/rclone/rclone.conf \
-      --drive-chunk-size 64M \
+      "/usr/sbin/rclone copy -vP \
+      --config=/boot/config/plugins/rclone/.rclone.conf \
+      --drive-chunk-size 1000M \
       --use-mmap \
       --delete-empty-src-dirs \
       --log-file="$LOG_FILE" \
       --stats=9999m \
-      --tpslimit=5 \
-      --transfers=2 \
+      --tpslimit=20 \
+      --transfers=10 \
       --checkers=4 \
-      --bwlimit=8M \
+      --bwlimit=20M \
       --drive-stop-on-upload-limit \
       "$SOURCE_DIR" "$DESTINATION_DIR" 2>&1
     )
-    # "--stats=9999m" mitigates early stats output 
+    # "--stats=9999m" mitigates early stats output
     # "2>&1" ensures error output when running via command line
     echo "$rclone_command"
   }
-  rclone_move
+  rclone_copy
 
   if [ "$DISCORD_WEBHOOK_URL" != "" ]; then
-  
+
     rclone_sani_command="$(echo $rclone_command | sed 's/\x1b\[[0-9;]*[a-zA-Z]//g')" # Remove all escape sequences
 
-    # Notifications assume following rclone ouput: 
+    # Notifications assume following rclone ouput:
     # Transferred: 0 / 0 Bytes, -, 0 Bytes/s, ETA - Errors: 0 Checks: 0 / 0, - Transferred: 0 / 0, - Elapsed time: 0.0s
 
     transferred_amount=${rclone_sani_command#*Transferred: }
     transferred_amount=${transferred_amount%% /*}
-    
+
     send_notification() {
       output_transferred_main=${rclone_sani_command#*Transferred: }
       output_transferred_main=${output_transferred_main% Errors*}
@@ -69,7 +71,7 @@ else
       output_transferred=${rclone_sani_command##*Transferred: }
       output_transferred=${output_transferred% Elapsed*}
       output_elapsed=${rclone_sani_command##*Elapsed time: }
-      
+
       notification_data='{
         "username": "'"$DISCORD_NAME_OVERRIDE"'",
         "avatar_url": "'"$DISCORD_ICON_OVERRIDE"'",
@@ -106,10 +108,10 @@ else
           }
         ]
       }'
-      
-      /usr/bin/curl -H "Content-Type: application/json" -d "$notification_data" $DISCORD_WEBHOOK_URL 
+
+      /usr/bin/curl -H "Content-Type: application/json" -d "$notification_data" $DISCORD_WEBHOOK_URL
     }
-    
+
     if [ "$transferred_amount" != "0" ]; then
       send_notification
     fi
