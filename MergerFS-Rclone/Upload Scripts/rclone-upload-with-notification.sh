@@ -31,7 +31,7 @@ else
 
   rclone_copy() {
     rclone_command=$(
-      "/usr/sbin/rclone copy -vP \
+      /usr/sbin/rclone copy -vP \
       --config=/boot/config/plugins/rclone/.rclone.conf \
       --drive-chunk-size 1000M \
       --use-mmap \
